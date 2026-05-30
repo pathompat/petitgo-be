@@ -3,21 +3,18 @@ import { HttpService } from '@nestjs/axios'
 import { ConfigService } from '@nestjs/config'
 import { Observable, map, catchError, lastValueFrom } from 'rxjs'
 import { AxiosResponse } from 'axios'
-import { firestore } from 'firebase-admin'
+import { adminDb } from '../firebase'
 
 @Injectable()
 export class BigsellerService {
-  private cookies: FirebaseFirestore.CollectionReference<FirebaseFirestore.DocumentData>
+  private cookies = adminDb.collection('cookies')
 
   constructor(
     private readonly http: HttpService,
     private config: ConfigService,
-  ) {
-    this.cookies = firestore().collection('cookies')
-  }
+  ) {}
 
   async getListProductShopee(): Promise<Observable<AxiosResponse<any[]>>> {
-    // get params copy from bigseller request
     const params = {
       orderBy: 'create_time',
       desc: 'true',
@@ -29,7 +26,6 @@ export class BigsellerService {
       pageSize: '50',
     }
 
-    // get an environment variable
     const headers = {
       Accept: 'application/json, text/plain, */*',
       'Content-Type': 'application/json;charset=UTF-8',
@@ -54,13 +50,13 @@ export class BigsellerService {
   async updateCookie(cookie: string, session: string): Promise<boolean> {
     let result = true
     const collection = await this.cookies.get()
-    await collection.forEach(async (doc) => {
-      const r: firestore.WriteResult = await doc.ref.update({
+    for (const doc of collection.docs) {
+      const r = await doc.ref.update({
         cookie: `muc_token=${cookie}; JSESSIONID=${session};`,
         updatedAt: new Date(),
       })
       result = result && !!r.writeTime
-    })
+    }
     return result
   }
 }

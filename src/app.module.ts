@@ -1,7 +1,8 @@
-import { Module, MiddlewareConsumer } from '@nestjs/common'
+import { Module } from '@nestjs/common'
+import { APP_GUARD } from '@nestjs/core'
 import { ConfigModule } from '@nestjs/config'
 import { AuthModule } from './auth/auth.module'
-import { AuthMiddleware } from './middleware/auth.middleware'
+import { JwtAuthGuard } from './auth/jwt-auth.guard'
 import { ProductsModule } from './products/products.module'
 import { BigsellerModule } from './bigseller/bigseller.module'
 
@@ -12,9 +13,11 @@ import { BigsellerModule } from './bigseller/bigseller.module'
     ProductsModule,
     BigsellerModule,
   ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+  ],
 })
-export class AppModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AuthMiddleware).forRoutes('')
-  }
-}
+export class AppModule {}
