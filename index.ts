@@ -5,6 +5,11 @@ import { AppModule } from './src/app.module'
 import { ValidationPipe } from '@nestjs/common'
 
 import { onRequest } from 'firebase-functions/v2/https'
+import { defineSecret } from 'firebase-functions/params'
+
+const jwtSecret = defineSecret('JWT_SECRET')
+const bigsellerCookie = defineSecret('BIGSELLER_COOKIE')
+const apiKey = defineSecret('API_KEY')
 
 const expressServer = express()
 
@@ -18,7 +23,10 @@ const createFunction = async (expressInstance): Promise<void> => {
   await app.init()
 }
 
-exports.api = onRequest(async (request, response) => {
-  await createFunction(expressServer)
-  expressServer(request, response)
-})
+exports.api = onRequest(
+  { secrets: [jwtSecret, bigsellerCookie, apiKey] },
+  async (request, response) => {
+    await createFunction(expressServer)
+    expressServer(request, response)
+  },
+)
