@@ -59,9 +59,9 @@ Required in `.env` for local dev (Cloud Functions reads these from Firebase runt
 
 | Variable | Purpose |
 |---|---|
-| `FIREBASE_PROJECT_ID` | Firebase Admin init |
-| `FIREBASE_CLIENT_EMAIL` | Firebase Admin init |
-| `FIREBASE_PRIVATE_KEY` | Firebase Admin init (newlines as `\n`) |
+| `FB_PROJECT_ID` | Firebase Admin init (local dev only — Cloud Functions uses ADC) |
+| `FB_CLIENT_EMAIL` | Firebase Admin init (local dev only) |
+| `FB_PRIVATE_KEY` | Firebase Admin init (local dev only, newlines as `\n`) |
 | `BIGSELLER_COOKIE` | Auth cookie for Bigseller API calls |
 | `API_KEY` | Legacy API key (no longer actively used) |
 | `JWT_SECRET` | Signs/verifies app JWTs |

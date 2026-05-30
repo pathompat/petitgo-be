@@ -1,5 +1,5 @@
 import 'dotenv/config' // load .env before firebase.ts reads process.env
-import './firebase'   // initialize Firebase Admin from .env
+import './firebase' // initialize Firebase Admin from .env
 import { NestFactory } from '@nestjs/core'
 import { ValidationPipe } from '@nestjs/common'
 import { AppModule } from './app.module'
