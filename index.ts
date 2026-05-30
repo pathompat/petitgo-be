@@ -5,11 +5,8 @@ import { AppModule } from './src/app.module'
 import { ValidationPipe } from '@nestjs/common'
 
 import { onRequest } from 'firebase-functions/v2/https'
-import { initializeApp } from 'firebase-admin/app'
 
 const expressServer = express()
-
-initializeApp()
 
 const createFunction = async (expressInstance): Promise<void> => {
   const app = await NestFactory.create(
