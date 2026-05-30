@@ -18,20 +18,18 @@ export class ProductsService {
   }
 
   findAll() {
-    return this.collection
-      .get()
-      .then((querySnapshot) => {
-        if (querySnapshot.empty) {
-          return []
-        }
+    return this.collection.get().then((querySnapshot) => {
+      if (querySnapshot.empty) {
+        return []
+      }
 
-        const products: Product[] = []
-        for (const doc of querySnapshot.docs) {
-          products.push(doc.data() as Product)
-        }
+      const products: Product[] = []
+      for (const doc of querySnapshot.docs) {
+        products.push(doc.data() as Product)
+      }
 
-        return products
-      })
+      return products
+    })
   }
 
   findOne(id: number) {

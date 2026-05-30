@@ -65,4 +65,4 @@ jobs:
           credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_PET_IT_GO }}
 
       - name: Deploy to Firebase Functions
-        run: npx firebase-tools deploy --only functions --project pet-it-go
+        run: npx firebase-tools deploy --only functions --project pet-it-go --force
