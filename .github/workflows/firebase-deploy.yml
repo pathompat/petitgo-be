@@ -64,5 +64,11 @@ jobs:
         with:
           credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_PET_IT_GO }}
 
+      - name: Create Firebase runtime env file
+        run: |
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
+          echo "BIGSELLER_COOKIE=${{ secrets.BIGSELLER_COOKIE }}" >> .env
+          echo "API_KEY=${{ secrets.API_KEY }}" >> .env
+
       - name: Deploy to Firebase Functions
         run: npx firebase-tools deploy --only functions --project pet-it-go --force
