@@ -1,18 +1,15 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { CreateProductDto } from './dto/create-product.dto'
 import { UpdateProductDto } from './dto/update-product.dto'
-import { firestore } from 'firebase-admin'
 import { REQUEST } from '@nestjs/core'
 import { Product } from './entities/product.entity'
-import QuerySnapshot = firestore.QuerySnapshot
+import { adminDb } from '../firebase'
 
 @Injectable()
 export class ProductsService {
-  private collection: FirebaseFirestore.CollectionReference<FirebaseFirestore.DocumentData>
+  private collection = adminDb.collection('products')
 
-  constructor(@Inject(REQUEST) private readonly request: { user: any }) {
-    this.collection = firestore().collection('products')
-  }
+  constructor(@Inject(REQUEST) private readonly request: { user: any }) {}
 
   create(createProductDto: CreateProductDto) {
     return this.collection.add(createProductDto).then((doc) => {
@@ -23,14 +20,14 @@ export class ProductsService {
   findAll() {
     return this.collection
       .get()
-      .then((querySnapshot: QuerySnapshot<Product>) => {
+      .then((querySnapshot) => {
         if (querySnapshot.empty) {
           return []
         }
 
         const products: Product[] = []
         for (const doc of querySnapshot.docs) {
-          products.push(doc.data())
+          products.push(doc.data() as Product)
         }
 
         return products
