@@ -4,7 +4,7 @@ import { AuthGuard } from '@nestjs/passport'
 import { IS_PUBLIC_KEY } from './public.decorator'
 
 @Injectable()
-export class JwtAuthGuard extends AuthGuard('jwt') {
+export class JwtAuthGuard extends AuthGuard(['jwt', 'api-key']) {
   constructor(private reflector: Reflector) {
     super()
   }

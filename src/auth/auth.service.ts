@@ -1,10 +1,22 @@
 import { ForbiddenException, Injectable } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { JwtService } from '@nestjs/jwt'
 import { adminAuth, adminDb } from '../firebase'
 
 @Injectable()
 export class AuthService {
-  constructor(private jwtService: JwtService) {}
+  private readonly apiKeys: string[]
+
+  constructor(
+    private jwtService: JwtService,
+    private config: ConfigService,
+  ) {
+    this.apiKeys = [this.config.get<string>('API_KEY')].filter(Boolean)
+  }
+
+  validateApiKey(apiKey: string): boolean {
+    return this.apiKeys.includes(apiKey)
+  }
 
   async loginWithFirebaseToken(idToken: string) {
     // 1. Verify the Firebase ID token (proves the user authenticated via Google)
