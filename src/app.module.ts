@@ -3,7 +3,6 @@ import { APP_GUARD } from '@nestjs/core'
 import { ConfigModule } from '@nestjs/config'
 import { AuthModule } from './auth/auth.module'
 import { JwtAuthGuard } from './auth/jwt-auth.guard'
-import { ProductsModule } from './products/products.module'
 import { BigsellerModule } from './bigseller/bigseller.module'
 import { TimesheetsModule } from './timesheets/timesheets.module'
 import { UsersModule } from './users/users.module'
@@ -12,7 +11,6 @@ import { UsersModule } from './users/users.module'
   imports: [
     ConfigModule.forRoot(),
     AuthModule,
-    ProductsModule,
     BigsellerModule,
     TimesheetsModule,
     UsersModule,
