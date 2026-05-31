@@ -30,9 +30,23 @@ export class TimesheetsService {
   }
 
   async findAll(status?: string) {
-    const snap = status
-      ? await this.col.where('status', '==', status).get()
-      : await this.col.get()
+    const { uid, role } = this.req.user
+    const isAdmin = role === 'ADMIN' || role === 'admin'
+
+    let query: FirebaseFirestore.Query = this.col
+
+    if (!isAdmin) {
+      // Resolve the user's document reference from the users collection
+      const userSnap = await adminDb.collection('users').where('uid', '==', uid).get()
+      if (userSnap.empty) return []
+      const userRef = userSnap.docs[0].ref
+      // timesheets may store userRef as a DocumentReference or as a plain uid string
+      query = query.where('userRef', 'in', [userRef, uid])
+    }
+
+    if (status) query = query.where('status', '==', status)
+
+    const snap = await query.get()
     return snap.docs
       .map(d => ({ id: d.id, ...(d.data() as object) }))
       .sort((a: any, b: any) => (b.createdAt > a.createdAt ? 1 : -1))
