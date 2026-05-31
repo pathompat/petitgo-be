@@ -6,6 +6,7 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard'
 import { ProductsModule } from './products/products.module'
 import { BigsellerModule } from './bigseller/bigseller.module'
 import { TimesheetsModule } from './timesheets/timesheets.module'
+import { UsersModule } from './users/users.module'
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { TimesheetsModule } from './timesheets/timesheets.module'
     ProductsModule,
     BigsellerModule,
     TimesheetsModule,
+    UsersModule,
   ],
   providers: [
     {
