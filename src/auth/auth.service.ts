@@ -29,6 +29,7 @@ export class AuthService {
       uid: string
       username: string
       role: string
+      name: string
     }
 
     // 3. Issue our own JWT so future API calls don't re-hit Firebase
@@ -36,6 +37,7 @@ export class AuthService {
       uid: userData.uid,
       username: userData.username,
       role: userData.role,
+      name: userData.name ?? '',
     }
 
     return {
