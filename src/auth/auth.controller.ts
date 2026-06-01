@@ -15,4 +15,11 @@ export class AuthController {
   login(@Body() dto: LoginDto) {
     return this.authService.loginWithFirebaseToken(dto.idToken)
   }
+
+  @ApiOperation({ summary: 'Exchange a LIFF ID token for an app JWT' })
+  @Public()
+  @Post('liff-login')
+  liffLogin(@Body() dto: LoginDto) {
+    return this.authService.loginWithLiffToken(dto.idToken)
+  }
 }
