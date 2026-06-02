@@ -2,6 +2,7 @@ import { Body, Controller, Post } from '@nestjs/common'
 import { ApiTags, ApiOperation } from '@nestjs/swagger'
 import { AuthService } from './auth.service'
 import { LoginDto } from './dto/login.dto'
+import { LiffLoginDto } from './dto/liff-login.dto'
 import { Public } from './public.decorator'
 
 @ApiTags('auth')
@@ -14,5 +15,12 @@ export class AuthController {
   @Post('login')
   login(@Body() dto: LoginDto) {
     return this.authService.loginWithFirebaseToken(dto.idToken)
+  }
+
+  @ApiOperation({ summary: 'Exchange a LIFF LINE access token for an app JWT' })
+  @Public()
+  @Post('liff-login')
+  liffLogin(@Body() dto: LiffLoginDto) {
+    return this.authService.loginWithLiff(dto.accessToken)
   }
 }
