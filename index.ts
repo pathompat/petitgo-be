@@ -13,6 +13,7 @@ const createFunction = async (expressInstance): Promise<void> => {
     AppModule,
     new ExpressAdapter(expressInstance),
   )
+  app.setGlobalPrefix('api')
   app.useGlobalPipes(new ValidationPipe())
   app.enableCors()
   await app.init()
