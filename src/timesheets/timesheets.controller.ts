@@ -16,6 +16,21 @@ export class TimesheetsController {
     return this.timesheetsService.create(dto)
   }
 
+  @ApiOperation({ summary: 'Summarize timesheet counts for a given month' })
+  @ApiQuery({ name: 'year', required: false, type: Number })
+  @ApiQuery({ name: 'month', required: false, type: Number })
+  @Get('stat')
+  getStat(
+    @Query('year') year?: string,
+    @Query('month') month?: string,
+  ) {
+    const now = new Date()
+    return this.timesheetsService.getStat(
+      year ? parseInt(year, 10) : now.getFullYear(),
+      month ? parseInt(month, 10) : now.getMonth() + 1,
+    )
+  }
+
   @ApiOperation({ summary: 'List timesheet entries' })
   @ApiQuery({ name: 'status', required: false, description: 'Filter by status' })
   @Get()
