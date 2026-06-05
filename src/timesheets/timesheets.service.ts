@@ -73,7 +73,7 @@ export class TimesheetsService {
 
     return {
       total: docs.length,
-      approved: docs.filter(d => d.status === 'APPROVED').length,
+      approved: docs.filter(d => d.status === 'APPROVED' || d.status === 'SETTLED').length,
       waiting: docs.filter(d => d.status === 'REQUESTED').length,
       rejected: docs.filter(d => d.status === 'REJECTED').length,
     }
