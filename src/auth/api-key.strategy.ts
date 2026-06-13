@@ -4,7 +4,10 @@ import { Injectable } from '@nestjs/common'
 import { AuthService } from './auth.service'
 
 @Injectable()
-export class ApiKeyStrategy extends PassportStrategy(HeaderAPIKeyStrategy, 'api-key') {
+export class ApiKeyStrategy extends PassportStrategy(
+  HeaderAPIKeyStrategy,
+  'api-key',
+) {
   constructor(private authService: AuthService) {
     super({ header: 'X-CLIENT-API-KEY', prefix: '' }, true, (apikey, done) => {
       const valid = authService.validateApiKey(apikey)

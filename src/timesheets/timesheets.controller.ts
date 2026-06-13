@@ -1,4 +1,13 @@
-import { Body, Controller, Delete, Get, Param, Put, Post, Query } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Put,
+  Post,
+  Query,
+} from '@nestjs/common'
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiQuery } from '@nestjs/swagger'
 import { TimesheetsService } from './timesheets.service'
 import { CreateTimesheetDto } from './dto/create-timesheet.dto'
@@ -20,10 +29,7 @@ export class TimesheetsController {
   @ApiQuery({ name: 'year', required: false, type: Number })
   @ApiQuery({ name: 'month', required: false, type: Number })
   @Get('stat')
-  getStat(
-    @Query('year') year?: string,
-    @Query('month') month?: string,
-  ) {
+  getStat(@Query('year') year?: string, @Query('month') month?: string) {
     const now = new Date()
     return this.timesheetsService.getStat(
       year ? parseInt(year, 10) : now.getFullYear(),
@@ -32,7 +38,11 @@ export class TimesheetsController {
   }
 
   @ApiOperation({ summary: 'List timesheet entries' })
-  @ApiQuery({ name: 'status', required: false, description: 'Filter by status' })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    description: 'Filter by status',
+  })
   @Get()
   findAll(@Query('status') status?: string) {
     return this.timesheetsService.findAll(status)

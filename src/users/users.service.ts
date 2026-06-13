@@ -12,7 +12,7 @@ export class UsersService {
 
   async getAll() {
     const snap = await adminDb.collection('users').get()
-    return snap.docs.map(d => this.serializeDoc(d))
+    return snap.docs.map((d) => this.serializeDoc(d))
   }
 
   async updateById(docId: string, dto: UpdateUserDto) {
@@ -22,7 +22,9 @@ export class UsersService {
 
     const payload: Record<string, any> = { ...dto, updatedAt: new Date() }
     // Remove undefined fields so we don't overwrite with null
-    Object.keys(payload).forEach(k => payload[k] === undefined && delete payload[k])
+    Object.keys(payload).forEach(
+      (k) => payload[k] === undefined && delete payload[k],
+    )
 
     await ref.update(payload)
     return this.serializeDoc(await ref.get())

@@ -36,7 +36,10 @@ export class TimesheetsService {
     let query: FirebaseFirestore.Query = this.col
 
     if (!isAdmin) {
-      const userSnap = await adminDb.collection('users').where('uid', '==', uid).get()
+      const userSnap = await adminDb
+        .collection('users')
+        .where('uid', '==', uid)
+        .get()
       if (userSnap.empty) return []
       const userRef = userSnap.docs[0].ref
       query = query.where('userRef', 'in', [userRef, uid])
@@ -46,7 +49,7 @@ export class TimesheetsService {
 
     const snap = await query.get()
     return snap.docs
-      .map(d => ({ id: d.id, ...(d.data() as object) }))
+      .map((d) => ({ id: d.id, ...(d.data() as object) }))
       .sort((a: any, b: any) => (b.createdAt > a.createdAt ? 1 : -1))
   }
 
@@ -65,17 +68,19 @@ export class TimesheetsService {
     const end = new Date(year, month, 1).getTime()
 
     const docs = snap.docs
-      .map(d => d.data())
-      .filter(d => {
+      .map((d) => d.data())
+      .filter((d) => {
         const t = d.startAt ? new Date(d.startAt as string).getTime() : 0
         return t >= start && t < end
       })
 
     return {
       total: docs.length,
-      approved: docs.filter(d => d.status === 'APPROVED' || d.status === 'SETTLED').length,
-      waiting: docs.filter(d => d.status === 'REQUESTED').length,
-      rejected: docs.filter(d => d.status === 'REJECTED').length,
+      approved: docs.filter(
+        (d) => d.status === 'APPROVED' || d.status === 'SETTLED',
+      ).length,
+      waiting: docs.filter((d) => d.status === 'REQUESTED').length,
+      rejected: docs.filter((d) => d.status === 'REJECTED').length,
     }
   }
 

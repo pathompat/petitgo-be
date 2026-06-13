@@ -8,7 +8,9 @@ import { BigsellerService } from './bigseller.service'
 export class BigsellerController {
   constructor(private bigsellerService: BigsellerService) {}
 
-  @ApiOperation({ summary: 'Store a new Bigseller session cookie in Firestore' })
+  @ApiOperation({
+    summary: 'Store a new Bigseller session cookie in Firestore',
+  })
   @ApiQuery({ name: 'cookie', description: 'Bigseller auth cookie value' })
   @ApiQuery({ name: 'session', description: 'Bigseller session value' })
   @Get('/cookie')
