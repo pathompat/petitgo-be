@@ -1,6 +1,7 @@
 import { cert, getApps, initializeApp } from 'firebase-admin/app'
 import { getAuth } from 'firebase-admin/auth'
 import { getFirestore } from 'firebase-admin/firestore'
+import { getStorage } from 'firebase-admin/storage'
 
 // Mirror of petitgo-fe/src/firebase.js — one init, shared exports.
 // Cloud Functions (index.ts) calls initializeApp() first; the guard below
@@ -28,3 +29,14 @@ if (!getApps().length) {
 
 export const adminAuth = getAuth()
 export const adminDb = getFirestore()
+
+// Cloud Storage bucket. The bucket name is resolved explicitly so it works in
+// both local dev (cert init, no default bucket) and Cloud Functions (ADC init).
+const projectId =
+  process.env.FB_PROJECT_ID ||
+  process.env.GCLOUD_PROJECT ||
+  process.env.GOOGLE_CLOUD_PROJECT ||
+  'pet-it-go'
+export const adminBucketName =
+  process.env.FB_STORAGE_BUCKET || `${projectId}.appspot.com`
+export const adminBucket = getStorage().bucket(adminBucketName)

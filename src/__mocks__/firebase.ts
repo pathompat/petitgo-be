@@ -16,3 +16,11 @@ const mockCollection = {
 export const adminDb = {
   collection: jest.fn().mockReturnValue(mockCollection),
 }
+
+export const adminBucketName = 'mock-bucket.appspot.com'
+
+export const adminBucket = {
+  file: jest.fn().mockReturnValue({
+    save: jest.fn().mockResolvedValue(undefined),
+  }),
+}

@@ -52,6 +52,7 @@ The old `AuthMiddleware` (header API key via `passport-headerapikey`) is superse
 - **`AuthModule`** — global module; exports `JwtModule` and `JwtAuthGuard` for use anywhere
 - **`ProductsModule`** — CRUD against Firestore `products` collection; `GET /products` merges Firestore data with live Bigseller data
 - **`BigsellerModule`** — proxies requests to the Bigseller API using a cookie stored in Firestore `cookies` collection; `GET /bigseller/cookie` updates that cookie
+- **`SlipsModule`** — accounting slip uploads against Firestore `slips` collection. `POST /slip/upload` stores the image in Firebase Storage under `slip/{yyyy}/{mm}/` and returns a tokenized download URL; `POST /slip` creates a log entry; `GET /slip` lists logs. `total_amount` is entered **manually** in the request body, because a Thai transfer-slip QR encodes the sending bank + transaction reference but **not** the amount. The slip's QR is still scanned best-effort (jimp + jsQR → promptparse) to capture `sending_bank` + `trans_ref` for reconciliation. (Auto-extracting the amount would require an external bank slip-verification API such as EasySlip/SlipOK.)
 
 ## Environment Variables
 
@@ -62,6 +63,7 @@ Required in `.env` for local dev (Cloud Functions reads these from Firebase runt
 | `FB_PROJECT_ID` | Firebase Admin init (local dev only — Cloud Functions uses ADC) |
 | `FB_CLIENT_EMAIL` | Firebase Admin init (local dev only) |
 | `FB_PRIVATE_KEY` | Firebase Admin init (local dev only, newlines as `\n`) |
+| `FB_STORAGE_BUCKET` | Cloud Storage bucket for slip uploads (optional; defaults to `<projectId>.appspot.com`) |
 | `BIGSELLER_COOKIE` | Auth cookie for Bigseller API calls |
 | `API_KEY` | Legacy API key (no longer actively used) |
 | `JWT_SECRET` | Signs/verifies app JWTs |
