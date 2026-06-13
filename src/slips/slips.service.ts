@@ -4,6 +4,7 @@ import { REQUEST } from '@nestjs/core'
 import { adminBucket, adminBucketName, adminDb } from '../firebase'
 import { CreateSlipDto } from './dto/create-slip.dto'
 import { extractSlipFromImage } from './slip-qr.util'
+import { ParsedFile } from './multipart.util'
 
 @Injectable()
 export class SlipsService {
@@ -15,7 +16,7 @@ export class SlipsService {
    * Upload a slip image to Firebase Storage under /slip/{yyyy}/{mm}/ and return
    * a tokenized download URL.
    */
-  async uploadImage(file: Express.Multer.File) {
+  async uploadImage(file: ParsedFile) {
     const now = new Date()
     const yyyy = now.getFullYear()
     const mm = String(now.getMonth() + 1).padStart(2, '0')

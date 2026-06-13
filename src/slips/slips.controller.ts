@@ -4,10 +4,9 @@ import {
   Controller,
   Get,
   Post,
-  UploadedFile,
-  UseInterceptors,
+  Req,
 } from '@nestjs/common'
-import { FileInterceptor } from '@nestjs/platform-express'
+import type { Request } from 'express'
 import {
   ApiTags,
   ApiBearerAuth,
@@ -17,6 +16,7 @@ import {
 } from '@nestjs/swagger'
 import { SlipsService } from './slips.service'
 import { CreateSlipDto } from './dto/create-slip.dto'
+import { parseMultipartFile } from './multipart.util'
 
 @ApiTags('slips')
 @ApiBearerAuth()
@@ -39,14 +39,14 @@ export class SlipsController {
     },
   })
   @Post('upload')
-  @UseInterceptors(
-    FileInterceptor('image', {
-      limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB
-      fileFilter: (_req, file, cb) => cb(null, /^image\//.test(file.mimetype)),
-    }),
-  )
-  upload(@UploadedFile() file: Express.Multer.File) {
-    if (!file) throw new BadRequestException('image file is required')
+  async upload(@Req() req: Request) {
+    const file = await parseMultipartFile(req, 'image')
+    if (!file || !file.buffer.length) {
+      throw new BadRequestException('image file is required')
+    }
+    if (!/^image\//.test(file.mimetype)) {
+      throw new BadRequestException('only image files are allowed')
+    }
     return this.slipsService.uploadImage(file)
   }
 
