@@ -4,7 +4,6 @@ import { REQUEST } from '@nestjs/core'
 import { ConfigService } from '@nestjs/config'
 import { adminBucket, adminBucketName, adminDb } from '../firebase'
 import { CreateSlipDto } from './dto/create-slip.dto'
-import { extractSlipFromImage } from './slip-qr.util'
 import { ParsedFile } from './multipart.util'
 import { sendSlipToDiscord } from './discord.util'
 
@@ -47,16 +46,14 @@ export class SlipsService {
   }
 
   /**
-   * Create a slip log entry. `total_amount` is supplied manually (Thai slip QRs
-   * do not carry the amount). The image's QR is still scanned best-effort to
-   * capture the sending bank + transaction reference for reconciliation.
+   * Create a slip log entry. `total_amount` is supplied manually in the request
+   * body.
    */
   async create(dto: CreateSlipDto) {
     const { uid } = this.req.user
 
-    // Fetch the image once, reuse it for QR scanning and the Discord photo.
+    // Fetch the image once for the Discord photo attachment.
     const imageBuffer = await this.fetchImage(dto.imageUrl)
-    const qr = await this.scanBuffer(imageBuffer)
 
     const data = {
       imageUrl: dto.imageUrl,
@@ -64,8 +61,6 @@ export class SlipsService {
       description: dto.description,
       uploadDate: dto.uploadDate,
       totalAmount: dto.totalAmount,
-      sendingBank: qr.sendingBank,
-      transRef: qr.transRef,
       createdAt: new Date().toISOString(),
     }
     const doc = await this.col.add(data)
@@ -90,8 +85,6 @@ export class SlipsService {
           description: x.description ?? '',
           totalAmount: x.totalAmount ?? null,
           uploadDate: x.uploadDate ?? null,
-          sendingBank: x.sendingBank ?? null,
-          transRef: x.transRef ?? null,
         }
       })
       .sort((a, b) => ((b.uploadDate ?? '') > (a.uploadDate ?? '') ? 1 : -1))
@@ -104,16 +97,6 @@ export class SlipsService {
       return Buffer.from(await res.arrayBuffer())
     } catch {
       return null
-    }
-  }
-
-  private async scanBuffer(buffer: Buffer | null) {
-    const empty = { totalAmount: null, sendingBank: null, transRef: null }
-    if (!buffer) return empty
-    try {
-      return await extractSlipFromImage(buffer)
-    } catch {
-      return empty
     }
   }
 
