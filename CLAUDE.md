@@ -45,13 +45,13 @@ Login flow (`POST /auth/login`):
 3. Looks up the user in the Firestore `users` collection by `uid`
 4. Issues our own JWT (7-day expiry) containing `{ uid, username, role }`
 
-The old `AuthMiddleware` (header API key via `passport-headerapikey`) is superseded by JWT and is no longer wired up.
+`JwtAuthGuard` accepts either strategy: a user JWT, or a service API key in the `X-CLIENT-API-KEY` header (`ApiKeyStrategy`, checked against `API_KEY`). Server-to-server callers such as petitgo-mcp use the API key. The old `AuthMiddleware` is not wired up.
 
 ## Modules
 
 - **`AuthModule`** — global module; exports `JwtModule` and `JwtAuthGuard` for use anywhere
 - **`ProductsModule`** — CRUD against Firestore `products` collection; `GET /products` merges Firestore data with live Bigseller data
-- **`BigsellerModule`** — proxies requests to the Bigseller API using a cookie stored in Firestore `cookies` collection; `GET /bigseller/cookie` updates that cookie
+- **`BigsellerModule`** — proxies requests to the Bigseller API using a cookie stored in Firestore `cookies` collection; `GET /bigseller/cookie` updates that cookie. `GET /bigseller/sales?date=YYYY-MM-DD` returns that day's totals from the dashboard's `orderSalesStatistics.json` (`{ date, available, orderCount?, amount? }`). BigSeller only returns the last 30 days, with no marketplace breakdown, and publishes a day some time after it ends, so `available: false` means "not published yet", not zero sales. It returns 502 if BigSeller fails (e.g. code 2001 when the session has expired) and 503 if no cookie is stored.
 - **`SlipsModule`** — accounting slip uploads against Firestore `slips` collection. `POST /slip/upload` stores the image in Firebase Storage under `slip/{yyyy}/{mm}/` and returns a tokenized download URL; `POST /slip` creates a log entry; `GET /slip` lists logs. `total_amount` and all other fields are supplied **manually** in the request body (there is no QR scanning — a Thai transfer-slip QR carries the sending bank + transaction reference but not the amount, and decoding full-resolution phone photos server-side was OOM-prone). After the slip is saved, if `DISCORD_SLIP_WEBHOOK_URL` is set, the description is posted to that Discord channel with the slip image attached as a photo (via the webhook's multipart form). The post is awaited but never fails the request.
 
 ## Environment Variables
@@ -66,5 +66,5 @@ Required in `.env` for local dev (Cloud Functions reads these from Firebase runt
 | `FB_STORAGE_BUCKET` | Cloud Storage bucket for slip uploads (optional; defaults to `<projectId>.appspot.com`) |
 | `DISCORD_SLIP_WEBHOOK_URL` | Discord Incoming Webhook URL; when set, each created slip is posted there (description + image). Optional — notifications are skipped if unset. |
 | `BIGSELLER_COOKIE` | Auth cookie for Bigseller API calls |
-| `API_KEY` | Legacy API key (no longer actively used) |
+| `API_KEY` | Service API key for `X-CLIENT-API-KEY` auth (used by petitgo-mcp) |
 | `JWT_SECRET` | Signs/verifies app JWTs |
