@@ -31,7 +31,7 @@ npm run deploy
 This project has **two entry points** that share the same NestJS `AppModule`:
 
 - **`src/main.ts`** — standard NestJS HTTP server, used for local development
-- **`index.ts`** (project root) — Firebase Cloud Functions v2 entry point (`exports.api`), used in production
+- **`index.ts`** (project root) — Firebase Cloud Functions v2 entry point (`exports.api`), used in production — region `asia-southeast1`, URL `https://api-w5rhc5q6zq-as.a.run.app/api`. Changing the region changes the URL: deploy to both regions first, move the callers (petitgo-fe `VITE_API_BASE_URL` secret, petitgo-extension `env.js`, petitgo-mcp `.env.pet-it-go`), then remove the old region, because CI deploys with `--force` and deletes the old function
 
 `src/firebase.ts` initializes Firebase Admin SDK once (guarded against double-init for the Cloud Functions case where `index.ts` calls `initializeApp()` first). It exports `adminAuth` and `adminDb` for use across services.
 
