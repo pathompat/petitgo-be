@@ -19,7 +19,13 @@ const createFunction = async (expressInstance): Promise<void> => {
   await app.init()
 }
 
-exports.api = onRequest(async (request, response) => {
-  await createFunction(expressServer)
-  expressServer(request, response)
-})
+// Migrating to asia-southeast1. Deployed in both regions until every caller
+// (petitgo-fe VITE_API_BASE_URL, petitgo-extension, petitgo-mcp) uses the
+// asia-southeast1 URL; then drop 'us-central1' here.
+exports.api = onRequest(
+  { region: ['us-central1', 'asia-southeast1'] },
+  async (request, response) => {
+    await createFunction(expressServer)
+    expressServer(request, response)
+  },
+)
