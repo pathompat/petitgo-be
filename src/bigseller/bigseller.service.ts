@@ -3,6 +3,7 @@ import {
   ForbiddenException,
   BadGatewayException,
   ServiceUnavailableException,
+  NotFoundException,
   Logger,
 } from '@nestjs/common'
 import { HttpService } from '@nestjs/axios'
@@ -11,6 +12,7 @@ import { Observable, map, catchError, lastValueFrom } from 'rxjs'
 import { AxiosResponse } from 'axios'
 import { adminDb } from '../firebase'
 import { DailySales } from './entities/daily-sales'
+import { CookieDocument } from './entities/cookies'
 
 const MONTHS = [
   'Jan',
@@ -157,4 +159,40 @@ export class BigsellerService {
     }
     return result
   }
+
+  async listCookies(): Promise<CookieDocument[]> {
+    const snapshot = await this.cookies.get()
+    return snapshot.docs.map(toCookieDocument)
+  }
+
+  /** Overwrites the stored Cookie header as-is (unlike updateCookie, no muc_token/JSESSIONID wrapping) */
+  async setCookie(id: string, cookie: string): Promise<CookieDocument> {
+    const ref = this.cookies.doc(id)
+    const doc = await ref.get()
+    if (!doc.exists) {
+      throw new NotFoundException(`Cookie document ${id} not found`)
+    }
+    await ref.update({ cookie: cookie.trim(), updatedAt: new Date() })
+    return toCookieDocument(await ref.get())
+  }
+}
+
+function toCookieDocument(
+  doc: FirebaseFirestore.DocumentSnapshot,
+): CookieDocument {
+  const data = doc.data() ?? {}
+  return {
+    id: doc.id,
+    cookie: data.cookie ?? '',
+    updatedAt: toIsoString(data.updatedAt),
+    latestNotifiedAt: toIsoString(data.latestNotifiedAt),
+  }
+}
+
+/** Firestore Timestamp (or Date) → ISO string; null when unset */
+function toIsoString(value: any): string | null {
+  if (!value) return null
+  const date =
+    typeof value.toDate === 'function' ? value.toDate() : new Date(value)
+  return date.toISOString()
 }
