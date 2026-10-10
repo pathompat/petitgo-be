@@ -17,6 +17,14 @@ export const adminDb = {
   collection: jest.fn().mockReturnValue(mockCollection),
 }
 
+export const adminCredential = {
+  getAccessToken: jest
+    .fn()
+    .mockResolvedValue({ access_token: 'mock-token', expires_in: 3600 }),
+}
+
+export const projectId = 'mock-project'
+
 export const adminBucketName = 'mock-bucket.appspot.com'
 
 export const adminBucket = {
