@@ -11,9 +11,12 @@ import { ApiTags, ApiBearerAuth, ApiOperation, ApiQuery } from '@nestjs/swagger'
 import { AdminGuard } from '../auth/admin.guard'
 import { BigsellerService } from './bigseller.service'
 import { DailySalesQueryDto } from './dto/daily-sales-query.dto'
+import { ListingsQueryDto } from './dto/listings-query.dto'
 import { UpdateCookieDto } from './dto/update-cookie.dto'
 import { DailySales } from './entities/daily-sales'
 import { CookieDocument } from './entities/cookies'
+import { InventoryList } from './entities/inventory'
+import { ListingList } from './entities/listing'
 
 @ApiTags('bigseller')
 @ApiBearerAuth()
@@ -40,6 +43,22 @@ export class BigsellerController {
   @Get('/sales')
   async getDailySales(@Query() query: DailySalesQueryDto): Promise<DailySales> {
     return await this.bigsellerService.getDailySales(query.date)
+  }
+
+  @ApiOperation({
+    summary: 'All warehouse SKUs with stock and cost from BigSeller',
+  })
+  @Get('/inventory')
+  async getInventory(): Promise<InventoryList> {
+    return await this.bigsellerService.getInventory()
+  }
+
+  @ApiOperation({
+    summary: 'Active listings (one item per variation) on a marketplace',
+  })
+  @Get('/listings')
+  async getListings(@Query() query: ListingsQueryDto): Promise<ListingList> {
+    return await this.bigsellerService.getListings(query.platform)
   }
 
   @ApiOperation({ summary: 'List stored Bigseller cookies (admin only)' })
